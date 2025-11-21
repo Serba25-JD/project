@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     main.appendChild(section);
     const footer = document.createElement('footer');
     const pFooter = document.createElement('p');
-    pFooter.textContent = 'Copyright Yoshua Franly Sihombing @2025';
+    pFooter.textContent = 'Made with ❤️: Jeremi. (2025)';
     footer.appendChild(pFooter);
     document.body.append(header, main, footer);
     validateForm();
