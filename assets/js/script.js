@@ -18,12 +18,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const labelType = document.createElement('label');
         labelType.textContent = input.label;
         labelType.htmlFor = input.id;
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('input-wrapper');
         const inputType = document.createElement('input');
         inputType.type = input.type;
         inputType.placeholder = `masukkan ${input.id}`;
         inputType.name = input.id;
         inputType.setAttribute('id', input.id);
-        section.append(labelType, inputType);
+        wrapper.appendChild(inputType);
+        if (input.id === 'password') {
+            const toggle = document.createElement('span');
+            toggle.textContent = '👁️';
+            toggle.classList.add('toggle-pass');
+            toggle.setAttribute('id', 'toggle-pass');
+            wrapper.appendChild(toggle);
+        }
+        section.append(labelType, wrapper);
     });
     const button = document.createElement('button');
     button.type = 'submit';
@@ -36,8 +46,23 @@ document.addEventListener('DOMContentLoaded', function() {
     pFooter.textContent = 'Made with ❤️: Jeremi. (2025)';
     footer.appendChild(pFooter);
     document.body.append(header, main, footer);
+    showPassword();
     validateForm();
 });
+
+function showPassword() {
+    const toggle = document.getElementById('toggle-pass');
+    toggle.addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        if(passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggle.textContent = '🙈';
+        } else {
+            passwordInput.type = 'password';
+            toggle.textContent = '👁️';
+        }
+    })
+}
 
 function validateForm() {
     const button = document.getElementById('login-btn');
@@ -82,14 +107,34 @@ function showForm() {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const loader = document.getElementById('loader');
+    const header = document.querySelector('header');
+    const section = document.querySelector('section');
+    const footer = document.querySelector('footer');
     if(email.value && password.value) {
         setTimeout(() => {
             loader.remove();
             setTimeout(() => {
-                alert('Login sukses.');
+                showAlert('Login sukses.');
                 email.value = '';
                 password.value = '';
+                header.remove();
+                section.remove();
+                footer.remove();
             }, 50);
         }, 2000);
     };
 };
+
+function showAlert(text) {
+    const section = document.querySelector('section');
+    const divContainer = document.createElement('div');
+    divContainer.classList.add('popup-container');
+    divContainer.setAttribute('id', 'popup-container');
+    const divContent = document.createElement('div');
+    divContent.classList.add('popup-content');
+    const pContent = document.createElement('p');
+    pContent.textContent = text;
+    divContent.appendChild(pContent);
+    divContainer.appendChild(divContent);
+    section.insertAdjacentElement('afterend', divContainer);
+}

@@ -113,10 +113,35 @@ main section {
     gap: 1rem;
 }
 
+
 label {
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--text);
+}
+
+.input-wrapper {
+    position: relative;
+    width: 300px;
+}
+
+.input-wrapper input {
+    width: 100%;
+}
+
+.toggle-pass {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.6;
+    user-select: none;
+}
+
+.toggle-pass:hover {
+    opacity: 1;
 }
 
 input {
@@ -157,7 +182,7 @@ button:active {
 #login-error {
 	color:  #ff0000;
 	font-size: 1rem;
-	font-weight: 900;
+	font-weight: 700;
 	text-align: center;
 }
 
@@ -168,6 +193,7 @@ footer {
 footer p {
 	font-size: 0.9rem;
 	font-weight: 700;
+    color: var(--secondary);
 }
 
 .loader-wrapper {
@@ -192,6 +218,29 @@ footer p {
     animation: spin 1s linear infinite;
 }
 
+.popup-container {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-container .popup-content {
+    background-color: var(--accent);
+    padding: 1rem;
+    border-radius: var(--radius);
+}
+
+.popup-container .popup-content p {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -205,6 +254,12 @@ footer p {
 	main section {
 		width: 250px;
 	}
+    .input-wrapper {
+        width: 228px;
+    }
+    .toggle-pass {
+        right: -1rem;
+    }
 }
 
 /* Tablet (601px – 900px) */
@@ -215,6 +270,15 @@ footer p {
 	main section {
 		width: 300px;
 	}
+    .input-wrapper {
+        width: 250px;
+    }
+    .input-wrapper {
+        width: 276px;
+    }
+    .toggle-pass {
+        right: -1rem;
+    }
 }
 
 /* Laptop (901px – 1200px) */
