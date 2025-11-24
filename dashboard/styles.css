@@ -188,12 +188,18 @@ html, body {
     font-weight: 700;
 }
 
-/* Popup Camera */
-
 /* Mobile (≤ 600px) */
 @media (max-width: 600px) {
     html, body {
         font-size: 70%;
+    }
+    #header-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+    }
+    .mid-content .right-container-content .right-container-content-list {
+        flex: 1 1 30%;
     }
 }
 
@@ -201,6 +207,14 @@ html, body {
 @media (min-width: 601px) and (max-width: 900px) {
     html, body {
         font-size: 80%;
+    }
+    #header-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+    }
+    .mid-content .right-container-content .right-container-content-list {
+        flex: 1 1 30%;
     }
 }
 
