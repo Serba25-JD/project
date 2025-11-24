@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const main = document.createElement('main');
     const section = document.createElement('section');
     const data = [
-        { 'label': 'Email', 'type': 'text', 'id': 'email'},
+        { 'label': 'Email/Username', 'type': 'text', 'id': 'email'},
         { 'label': 'Password', 'type': 'password', 'id': 'password'}
     ];
     data.forEach(input => {
@@ -22,15 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.classList.add('input-wrapper');
         const inputType = document.createElement('input');
         inputType.type = input.type;
-        inputType.placeholder = `masukkan ${input.id}`;
+        inputType.placeholder = `Masukkan ${input.label}`;
         inputType.name = input.id;
         inputType.setAttribute('id', input.id);
         wrapper.appendChild(inputType);
         if (input.id === 'password') {
-            const toggle = document.createElement('span');
-            toggle.textContent = '👁️';
+            const toggle = document.createElement('i');
+            toggle.setAttribute('data-feather', 'eye');
             toggle.classList.add('toggle-pass');
-            toggle.setAttribute('id', 'toggle-pass');
             wrapper.appendChild(toggle);
         }
         section.append(labelType, wrapper);
@@ -46,23 +45,26 @@ document.addEventListener('DOMContentLoaded', function() {
     pFooter.textContent = 'Made with ❤️: Jeremi. (2025)';
     footer.appendChild(pFooter);
     document.body.append(header, main, footer);
+    feather.replace();
     showPassword();
     validateForm();
 });
 
 function showPassword() {
-    const toggle = document.getElementById('toggle-pass');
-    toggle.addEventListener('click', function() {
-        const passwordInput = document.getElementById('password');
-        if(passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggle.textContent = '🙈';
-        } else {
-            passwordInput.type = 'password';
-            toggle.textContent = '👁️';
-        }
-    })
+    feather.replace();
+    let icon = document.querySelector('.input-wrapper svg');
+    const password = document.getElementById('password');
+    function toggle() {
+        const isHidden = password.type === 'password';
+        password.type = isHidden ? 'text' : 'password';
+        icon.setAttribute('data-feather', isHidden ? 'eye-off' : 'eye');
+        feather.replace();
+        icon = document.querySelector('.input-wrapper svg');
+        icon.addEventListener('click', toggle);
+    }
+    icon.addEventListener('click', toggle);
 }
+
 
 function validateForm() {
     const button = document.getElementById('login-btn');
@@ -79,7 +81,7 @@ function validateForm() {
         if(!email && !password) {
             error.textContent = 'Silahkan masukkan email dan password terlebih dahulu.';
         } else if(!email) {
-            error.textContent = 'Silahkan masukkan email terlebih dahulu.';
+            error.textContent = 'Silahkan masukkan email atau username terlebih dahulu.';
         } else if(!emailPattern.test(email)) {
             error.textContent = 'Silahkan masukkan email dengan berformat @gmail.com';
         } else if(!password) {
@@ -106,27 +108,61 @@ function showLoading() {
 function showForm() {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
-    const loader = document.getElementById('loader');
-    const header = document.querySelector('header');
-    const section = document.querySelector('section');
-    const footer = document.querySelector('footer');
-    if(email.value && password.value) {
-        setTimeout(() => {
-            loader.remove();
+    fetch('https://sukasehat.com/API/public/absen/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value, password: password.value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        clearLoader();
+        result = data.data;
+        if(result.success) {
+            clearFormLoginSuccess();
+            showAlert(result.message);
+            localStorage.setItem('user', result.user.username);
             setTimeout(() => {
-                showAlert('Login sukses.');
-                email.value = '';
-                password.value = '';
-                header.remove();
-                section.remove();
-                footer.remove();
-            }, 50);
-        }, 2000);
-    };
+                window.location.href = 'dashboard';
+            }, 1000);
+        } else {
+            showAlert(result.message);
+            password.value = '';
+            clearPopup();
+        }
+    })
+    .catch(err => { 
+        showAlert('Server sedang down.');
+        clearPopup();
+    })
 };
 
+function clearFormLoginSuccess() {
+    setTimeout(() => {
+        const header = document.querySelector('header');
+        const main = document.querySelector('main');
+        const footer = document.querySelector('footer');
+        header.remove();
+        main.remove();
+        footer.remove();
+    }, 100);
+}
+
+function clearLoader() {
+    setTimeout(() => {
+        const loader = document.getElementById('loader');
+        loader.remove();
+    }, 100);
+}
+
+function clearPopup() {
+    setTimeout(() => {
+        const popup = document.getElementById('popup-container');
+        if(popup) popup.remove();
+    }, 1500);
+}
+
+
 function showAlert(text) {
-    const section = document.querySelector('section');
     const divContainer = document.createElement('div');
     divContainer.classList.add('popup-container');
     divContainer.setAttribute('id', 'popup-container');
@@ -136,5 +172,5 @@ function showAlert(text) {
     pContent.textContent = text;
     divContent.appendChild(pContent);
     divContainer.appendChild(divContent);
-    section.insertAdjacentElement('afterend', divContainer);
+    document.body.appendChild(divContainer);
 }

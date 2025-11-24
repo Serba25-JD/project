@@ -1,0 +1,43 @@
+{
+    "user": [
+        {
+            "username": "erikhardiansyah749",
+            "name": "Erik Hardiansyah",
+            "email": "erikhardiansyah749@gmail.com",
+            "password": "erikhardiansyah749@gmail.com",
+            "image": "https://serba25-jd.github.io/portofolio/assets/image/main/profile-first.webp",
+            "work_today": "25 hari",
+            "work_week": "4 minggu",
+            "work_month": "1 bulan",
+            "work_late": "tidak ada",
+            "work_in": "22 november 2025",
+            "work_out": "22 november 2025"
+        },
+        {
+            "username": "erikhardiansyah22",
+            "name": "Erik Hardiansyah",
+            "email": "erikhardiansyah22@gmail.com",
+            "password": "erikhardiansyah22@gmail.com",
+            "image": "https://serba25-jd.github.io/portofolio/assets/image/main/profile-first.webp",
+            "work_today": "25 hari",
+            "work_week": "4 minggu",
+            "work_month": "1 bulan",
+            "work_late": "tidak ada",
+            "work_in": "22 november 2025",
+            "work_out": "22 november 2025"
+        },
+        {
+            "username": "erikhardiansyah33",
+            "name": "Erik Hardiansyah",
+            "email": "erikhardiansyah33@gmail.com",
+            "password": "erikhardiansyah33@gmail.com",
+            "image": "https://serba25-jd.github.io/portofolio/assets/image/main/profile-first.webp",
+            "work_today": "25 hari",
+            "work_week": "4 minggu",
+            "work_month": "1 bulan",
+            "work_late": "tidak ada",
+            "work_in": "22 november 2025",
+            "work_out": "22 november 2025"
+        }
+    ]
+}

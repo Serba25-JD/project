@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Color Styles */
+:root {
+    --primary: #ffffff;
+    --secondary: #2c2c2c;
+    --text: #333;
+    --accent: #0077ff;
+    --bg: #faefef;
+    --radius: 8px;
+}
+
+/* CSS Reset Styles */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1.6;
+    font-family: "Montserrat", sans-serif;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+/* Header */
+#header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem;
+}
+
+#header-container .header-container-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#header-container h1 {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+#header-container p {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+#header-container .header-container-content #user_log-out {
+    cursor: pointer;
+    background-color: var(--accent);
+    padding: 0.5rem;
+    color: var(--bg);
+    border-radius: var(--radius);
+}
+
+#header-container .header-container-content #user_log-out:hover {
+    transform: scale(1.1);
+}
+
+/* Section Mid */
+.mid-content {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.mid-content .left-container-content {
+    background-color: var(--primary);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    flex: 1 1 20%;
+}
+
+.mid-content .left-container-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.mid-content .left-container-content img {
+    width: 20%;
+    height: auto;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+    margin: 2rem 0;
+}
+
+.mid-content .left-container-content p {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.mid-content .right-container-content {
+    background-color: var(--primary);
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    flex: 1 1 60%;
+    flex-wrap: wrap;
+}
+
+.mid-content .right-container-content .right-container-content-list {
+    background-color: var(--bg);
+    padding: 1rem;
+    box-sizing: border-box;
+    flex: 1 1 20%;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mid-content .right-container-content .right-container-content-list:hover {
+    transform: scaleY(1.1);
+}
+
+.mid-content .right-container-content .right-container-content-list h2 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.mid-content .right-container-content .right-container-content-list .right-container-content-desc {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mid-content .right-container-content .right-container-content-list .right-container-content-desc .icon {
+    margin: 1rem 0;
+}
+
+.mid-content .right-container-content .right-container-content-list .right-container-content-desc p {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Popup Camera */
+
+/* Mobile (≤ 600px) */
+@media (max-width: 600px) {
+    html, body {
+        font-size: 70%;
+    }
+}
+
+/* Tablet (601px – 900px) */
+@media (min-width: 601px) and (max-width: 900px) {
+    html, body {
+        font-size: 80%;
+    }
+}
+
+/* Laptop (901px – 1200px) */
+@media (min-width: 901px) and (max-width: 1200px) {
+    html, body {
+        font-size: 100%;
+    }
+}
+
+/* Desktop (≥ 1201px) */
+@media (min-width: 1201px) {
+    html, body {
+        font-size: 100%;
+    }
+}
