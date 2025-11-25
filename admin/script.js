@@ -73,5 +73,26 @@ function showLayoutMain() {
     // Right
     const sectionRight = document.createElement('section');
     sectionRight.classList.add('container');
+    sectionRight.setAttribute('id', 'container-right');
     main.append(sectionLeft, sectionRight);
+    showRightData();
+}
+
+function showRightData() {
+    const dataList = document.getElementById('create_user');
+    dataList.addEventListener('click', function() {
+        const sectionRight = document.getElementById('container-right');
+        const div = document.createElement('div');
+        const inputData = [
+            { 'id': 'email', 'type': 'text', 'placeholder': 'masukkan email ataupun username', 'label': 'Email/Username'},
+            { 'id': 'password', 'type': 'password', 'placeholder': 'masukkan password', 'label': 'Password'},
+        ];
+        inputData.forEach(input => {
+            const inputTag = document.createElement('input');
+            inputTag.placeholder = input.placeholder;
+            inputTag.setAttribute('id', input.id);
+            div.appendChild(inputTag);
+        });
+        sectionRight.appendChild(div);
+    })
 }
