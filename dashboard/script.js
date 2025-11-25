@@ -94,6 +94,7 @@ function startGreetings() {
 };
 
 function showLayoutMain() {
+    showLoading();
     const main = document.getElementById('main-container');
     const userData = localStorage.getItem('user');
     fetch(`https://sukasehat.com/API/public/absen/login/user?username=${userData}`)
@@ -147,65 +148,73 @@ function showLayoutMain() {
         feather.replace();
         startClock();
         showMidData();
+        clearShowLoading();
     });
 }
 
 function showMidData() {
-    showWorkToday();
-    showWorkWeek();
-    showWorkMonth();
-    showWorkLate();
+    showWorkData();
     showWorkIn();
     showWorkOut();
 }
 
-function showWorkToday() {
-    const userData = localStorage.getItem('user');
-    const container = document.getElementById('today-work');
-    const p = document.createElement('p');
-    if(userData.work_today) {
-        p.textContent = `${userData.work_today}`;
-        container.appendChild(p);
-    } else {
-        p.textContent = 'Tidak ada data.';
-    }
+function decimalToHourMinute(decimal) {
+    const hours = Math.floor(decimal);
+    const minutes = Math.round((decimal - hours) * 60);
+    return `${hours} jam ${minutes} menit`;
 }
 
-function showWorkWeek() {
+function showWorkData() {
     const userData = localStorage.getItem('user');
-    const container = document.getElementById('week-work');
-    const p = document.createElement('p');
-    if(userData.work_week) {
-        p.textContent = `${userData.work_week}`;
-        container.appendChild(p);
-    } else {
-        p.textContent = 'Tidak ada data.';
-    }
+    fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
+    .then(response => response.json())
+    .then(data => {
+        const stats = data.result.stats;
+        const statMap = {
+            'today-work': 'today_hours',
+            'week-work': 'week_hours',
+            'month-work': 'month_hours',
+            'late-work': 'late_days'
+        };
+        for (const [elementId, statKey] of Object.entries(statMap)) {
+            const el = document.getElementById(elementId);
+            if (!el) continue;
+            let valueContainer = el.querySelector('.work-value');
+            if (!valueContainer) {
+                valueContainer = document.createElement('div');
+                valueContainer.classList.add('work-value');
+                el.appendChild(valueContainer);
+            }
+            valueContainer.innerHTML = '';
+            const value = stats[statKey];
+            if (value && value !== 0) {
+                if (statKey === 'late_days') {
+                    const p = document.createElement('p');
+                    p.textContent = `${value} hari`;
+                    valueContainer.appendChild(p);
+                } else if (statKey === 'month_hours') {
+                    const p1 = document.createElement('p');
+                    p1.textContent = decimalToHourMinute(value);
+                    valueContainer.appendChild(p1);
+
+                    const workDays = stats['work_days_month'] || 0;
+                    const p2 = document.createElement('p');
+                    p2.textContent = `${workDays} hari kerja bulan ini`;
+                    valueContainer.appendChild(p2);
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = decimalToHourMinute(value);
+                    valueContainer.appendChild(p);
+                }
+            } else {
+                const p = document.createElement('p');
+                p.textContent = 'Tidak ada data.';
+                valueContainer.appendChild(p);
+            }
+        }
+    });
 }
 
-function showWorkMonth() {
-    const userData = localStorage.getItem('user');
-    const container = document.getElementById('month-work');
-    const p = document.createElement('p');
-    if(userData.work_month) {
-        p.textContent = `${userData.work_month}`;
-        container.appendChild(p);
-    } else {
-        p.textContent = 'Tidak ada data.';
-    }
-}
-
-function showWorkLate() {
-    const userData = localStorage.getItem('user');
-    const container = document.getElementById('late-work');
-    const p = document.createElement('p');
-    if(userData.work_late) {
-        p.textContent = `${userData.work_late}`;
-        container.appendChild(p);
-    } else {
-        p.textContent = 'Tidak ada data.';
-    }
-}
 
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     const R = 6371;
@@ -224,72 +233,217 @@ function showWorkIn() {
     const userData = localStorage.getItem('user');
     const container = document.getElementById('main-container');
     const inWork = document.getElementById('in-work');
-    inWork.addEventListener('click', function () {
-        const waktuAbsen = new Date().toLocaleTimeString("id-ID", { timeZone: "Asia/Jakarta" });
-        const sekolahLat = '3.5992882';
-        const sekolahLng = '98.6448291';
-        const radiusMeter = 20;
-        if(!navigator.geolocation) {
-            alert('Browser tidak mendukung lokasi.');
-        }
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                const userLat = pos.coords.latitude;
-                const userLng = pos.coords.longitude;
-                const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
-                const jarakMeter = jarakKm * 1000;
-                if (jarakMeter <= radiusMeter) {
-                    alert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.setAttribute('id', 'camera-input');
-                    input.accept = 'image/*';
-                    input.capture = 'camera';
-                    input.style.display = 'none';
-                    container.appendChild(input);
-                    input.click();
-                    input.addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if(!file) return;
-                        const tanggal = `${formatDate(new Date())}`;
-                        const waktuAbsen = new Date().toLocaleTimeString("id-ID", { timeZone: "Asia/Jakarta" });
-                        const image = file;
-                        const latitude = userLat;
-                        const longitude = userLng;
-                        fetch('https://sukasehat.com/API/public/absen/login/user_upload', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username: userData, tanggal: tanggal, time: waktuAbsen, image: image, latitude: latitude, longitude: longitude})
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.data.message);
-                            let p = document.getElementById('in-work-text');
-                            if(!p) {
-                                p = document.createElement('p');
-                                p.setAttribute('id', 'in-work-text');
-                                p.textContent = `${waktuAbsen}`;
-                                inWork.appendChild(p);
-                            }
-                        })
-                    })
-                } else {
-                    alert(`Terlalu jauh: ${jarakMeter.toFixed(2)} meter. Absen ditolak.`);
+    const classInWork = inWork.closest('.right-container-content-list');
+    fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
+    .then(response => response.json())
+    .then(data => {
+        const result_time = data.result.in.time;
+        if(data.result.in.status === false) {
+            classInWork.classList.remove('active');
+            function handleClick() {
+                const waktuAbsen = new Date().toLocaleTimeString("id-ID", { timeZone: "Asia/Jakarta" });
+                const tanggal = `${formatDate(new Date())}`;
+                const sekolahLat = 3.5992882;
+                const sekolahLng = 98.6448291;
+                const radiusMeter = 20;
+                if (!navigator.geolocation) {
+                    showAlert('Browser tidak mendukung lokasi.');
+                    return;
                 }
-            }
-        )
-    });
+                navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+                    const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
+                    const jarakMeter = jarakKm * 1000;
+                    if (jarakMeter => radiusMeter) {
+                        showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.capture = 'camera';
+                        input.style.display = 'none';
+                        container.appendChild(input);
+                        input.click();
+                        input.addEventListener('change', function (e) {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                const base64Image = event.target.result.split(',')[1];
+                                fetch('https://sukasehat.com/API/public/absen/login/user_upload', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        username: userData,
+                                        tanggal: tanggal,
+                                        status: true,
+                                        time: waktuAbsen,
+                                        image: base64Image,
+                                        latitude: userLat,
+                                        longitude: userLng,
+                                        jenis: 'in'
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if(data.data.success === true) {
+                                        showAlert('Absen berhasil.');
+                                        const p = document.createElement('p');
+                                        p.textContent = waktuAbsen;
+                                        classInWork.classList.add('active');
+                                        inWork.appendChild(p);
+                                        inWork.removeEventListener('click', handleClick);
+                                    }
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        showAlert(`Terlalu jauh: ${jarakMeter.toFixed(2)} meter. Absen ditolak.`);
+                    }
+                });
+            };
+            inWork.addEventListener('click', handleClick);
+        } else {
+            const inWork = document.getElementById('in-work');
+            classInWork.classList.add('active');
+            const p = document.createElement('p');
+            p.textContent = result_time;
+            inWork.appendChild(p);
+            inWork.style.pointerEvents = 'none'
+            inWork.style.opacity = '0.6';
+            return;
+        }
+    })
 }
-
 
 function showWorkOut() {
     const userData = localStorage.getItem('user');
-    const container = document.getElementById('out-work');
+    const container = document.getElementById('main-container');
+    const outWork = document.getElementById('out-work');
+    const classoutWork = outWork.closest('.right-container-content-list');
+    fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
+    .then(response => response.json())
+    .then(data => {
+        const result_time = data.result.out.time;
+        if(data.result.out.status === false) {
+            classoutWork.classList.remove('active');
+            function handleClick() {
+                const waktuAbsen = new Date().toLocaleTimeString("id-ID", { timeZone: "Asia/Jakarta" });
+                const tanggal = `${formatDate(new Date())}`;
+                const sekolahLat = 3.5992882;
+                const sekolahLng = 98.6448291;
+                const radiusMeter = 20;
+                if (!navigator.geolocation) {
+                    showAlert('Browser tidak mendukung lokasi.');
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+                    const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
+                    const jarakMeter = jarakKm * 1000;
+                    if (jarakMeter => radiusMeter) {
+                        showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.capture = 'camera';
+                        input.style.display = 'none';
+                        container.appendChild(input);
+                        input.click();
+                        input.addEventListener('change', function (e) {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = function (event) {
+                                const base64Image = event.target.result.split(',')[1];
+                                fetch('https://sukasehat.com/API/public/absen/login/user_upload', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        username: userData,
+                                        tanggal: tanggal,
+                                        status: true,
+                                        time: waktuAbsen,
+                                        image: base64Image,
+                                        latitude: userLat,
+                                        longitude: userLng,
+                                        jenis: 'out'
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if(data.data.success === true) {
+                                        showAlert('Absen berhasil.');
+                                        const p = document.createElement('p');
+                                        p.textContent = waktuAbsen;
+                                        classoutWork.classList.add('active');
+                                        outWork.appendChild(p);
+                                        outWork.removeEventListener('click', handleClick);
+                                    }
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        showAlert(`Terlalu jauh: ${jarakMeter.toFixed(2)} meter. Absen ditolak.`);
+                    }
+                });
+            };
+            outWork.addEventListener('click', handleClick);
+        } else {
+            const outWork = document.getElementById('out-work');
+            classoutWork.classList.add('active');
+            const p = document.createElement('p');
+            p.textContent = result_time;
+            outWork.appendChild(p);
+            outWork.style.pointerEvents = 'none'
+            outWork.style.opacity = '0.6';
+            return;
+        }
+    })
+}
+
+function showAlert(text) {
+    const main = document.getElementById('main-container');
+    const divContainer = document.createElement('div');
+    divContainer.classList.add('alert-container');
+    divContainer.setAttribute('id', 'alert-container');
+    const divContent = document.createElement('div');
+    divContent.classList.add('alert-content');
     const p = document.createElement('p');
-    if(userData.work_out) {
-        p.textContent = `${userData.work_out}`;
-        container.appendChild(p);
-    } else {
-        p.textContent = 'Tidak ada data.';
-    }
+    p.textContent = text;
+    const button = document.createElement('button');
+    button.setAttribute('id', 'alert-close');
+    button.textContent = 'Saya mengerti.';
+    button.type = 'reset';
+    divContent.append(p, button);
+    divContainer.appendChild(divContent);
+    main.insertAdjacentElement('beforeend', divContainer);
+    const buttonClose = document.getElementById('alert-close');
+    buttonClose.addEventListener('click', function() {
+        const alert = document.getElementById('alert-container');
+        alert.remove();
+    })
+}
+
+function showLoading() {
+    const section = document.getElementById('main-container');
+    const loadingContainer = document.createElement('div');
+    loadingContainer.classList.add('loader-wrapper');
+    loadingContainer.setAttribute('id', 'loader');
+    const loadingContent = document.createElement('div');
+    loadingContent.classList.add('loader');
+    loadingContainer.appendChild(loadingContent);
+    section.insertAdjacentElement('beforeend', loadingContainer);
+};
+
+function clearShowLoading() {
+    setTimeout(() => {
+        const loader = document.getElementById('loader');
+        loader.remove();
+    }, 100);
 }

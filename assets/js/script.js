@@ -82,7 +82,7 @@ function validateForm() {
             error.textContent = 'Silahkan masukkan email dan password terlebih dahulu.';
         } else if(!email) {
             error.textContent = 'Silahkan masukkan email atau username terlebih dahulu.';
-        } else if(!emailPattern.test(email)) {
+        } else if(email.includes('@') && !emailPattern.test(email)) {
             error.textContent = 'Silahkan masukkan email dengan berformat @gmail.com';
         } else if(!password) {
             error.textContent = 'Silahkan masukkan password terlebih dahulu.';
@@ -118,17 +118,25 @@ function showForm() {
         clearLoader();
         result = data.data;
         if(result.success) {
-            clearFormLoginSuccess();
-            showAlert(result.message);
-            localStorage.setItem('user', result.user.username);
-            setTimeout(() => {
-                window.location.href = 'dashboard';
-            }, 1000);
+            if(result.token) {
+                clearFormLoginSuccess();
+                showAlert(result.message);
+                setTimeout(() => {
+                    window.location.href = 'admin';
+                }, 1000);
+            } else {
+                clearFormLoginSuccess();
+                showAlert(result.message);
+                localStorage.setItem('user', result.user);
+                setTimeout(() => {
+                    window.location.href = 'dashboard';
+                }, 1000);
+            };
         } else {
             showAlert(result.message);
             password.value = '';
             clearPopup();
-        }
+        };
     })
     .catch(err => { 
         showAlert('Server sedang down.');
