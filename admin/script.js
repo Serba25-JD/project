@@ -80,7 +80,8 @@ function showLayoutMain() {
 
 function showRightData() {
     const dataList = document.getElementById('create_user');
-    dataList.addEventListener('click', function() {
+    dataList.addEventListener('click', function(e) {
+        e.preventDefault();
         const sectionRight = document.getElementById('container-right');
         const div = document.createElement('div');
         const inputData = [
