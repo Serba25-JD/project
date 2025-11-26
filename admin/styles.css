@@ -101,40 +101,160 @@ html, body {
 }
 
 
-/* Main */
-#main-container {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 2rem;
-    padding: 2rem;
-}
-
-
+/* Container */
 .container {
     background-color: var(--primary);
     padding: 2rem;
-    border-radius: var(--radius);
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
-.container .container-left {
+.container p {
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Container top */
+.container .container-top {
     display: flex;
-    flex-direction: column;
     gap: 2rem;
 }
 
-.container .container-left .container-left-list.active {
-    border-bottom: 0.2rem solid var(--accent);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    padding: 0.5rem;
+.container .container-top .container-top-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background-color: var(--accent);
+    width: 150px;
+    padding: 1rem;
+    color: var(--bg);
     border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 2rem;
 }
 
-.container .container-left .container-left-list a {
-    text-decoration: none;
-    color: var(--text);
+.container .container-top .container-top-icon:hover {
+    background: #005fcc;
+}
+
+
+/* Container table */
+.container-table {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-table .container-table-header {
+    display: grid;
+    grid-template-columns: 100px 300px 300px 300px;
+    gap: 2rem;
+    align-items: center;
+    background-color: var(--accent);
+    padding: 1rem;
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.container-table .container-table-header .table-header h2 {
     font-size: 1rem;
     font-weight: 700;
+    color: var(--bg);
+}
+
+.container-table .container-table-content .table-container {
+    display: grid;
+    grid-template-columns: 100px 300px 300px 300px;
+    gap: 2rem;
+    align-items: center;
+    padding: 1rem;
+    border: 0.1rem solid var(--secondary);
+    border-radius: var(--radius);
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.container-table .container-table-content .table-container .table-content img {
+    width: 20%;
+    height: auto;
+    border-radius: 50%;
+}
+
+.container-table .container-table-content .table-container .button-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.container-table .container-table-content .table-container .button-container .button-container-content {
+    padding: 0.5rem;
+    font-size: 1rem;
+    background: var(--accent);
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1 1 30%;
+    box-sizing: border-box;
+}
+
+.container-table .container-table-content .table-container .button-container .button-container-content:hover {
+    background: #005fcc;
+}
+
+/* Container content add user*/
+#container-add-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#container-add-user #add-user-btn {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    font-size: 1rem;
+    background: var(--accent);
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    width: 280px;
+}
+
+#container-add-user #add-user-btn:hover {
+    background: #005fcc;
+}
+
+.container-add-user-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem 0;
+    align-items: flex-start;
+}
+.container-add-user-content label {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.container-add-user-content input {
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #ddd;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    transition: 0.2s;
+    width: 250px;
+}
+
+.container-add-user-content input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(0, 119, 255, 0.35);
 }
 
 /* Mobile (≤ 600px) */
