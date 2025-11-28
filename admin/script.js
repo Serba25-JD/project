@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function showLayout() {
     showLayoutHeader();
     showLayoutTop();
-    // showDataTabel();
+    refreshData();
 }
 
 function removeTag(id) {
@@ -76,92 +76,175 @@ function showLayoutTop() {
         divAdd.appendChild(divIcon);
     });
     section.appendChild(divAdd);
-    main.insertAdjacentElement('afterend', section);
+    main.insertAdjacentElement('beforeend', section);
     feather.replace();
     showAddUser();
-    refreshData();
     showDataTable();
 }
 
+let dataUser = [];
+let allDataUser = [];
 
 function showDataTable() {
-    const divContainer = document.getElementById('container-add')
     fetch('https://sukasehat.com/API/public/absen/user-list')
     .then(response => response.json())
     .then(data => {
         result = data.result;
         if(result.message) {
+            showLoading();
+            const divContainer = document.getElementById('container-top');
+            removeTag('text-message');
+            removeTag('container-table');
             const pData = document.createElement('p');
             pData.setAttribute('id', 'text-message');
             pData.textContent = result.message;
             divContainer.insertAdjacentElement('afterend', pData);
+            clearShowLoading();
+            dataUser = [];
+            allDataUser = [];
+            return;
         } else if (result.users && result.users.length > 0) {
-            removeTag('text-message');
-            createDataTable(result.users);
+            const newDataUser = result.users.map(user => user.name);
+            const isSame = dataUser.length === newDataUser.length && dataUser.every((val, index) => val === newDataUser[index]);
+            if(isSame) {
+                showLoading();
+                clearShowLoading();
+                return;
+            }
+            dataUser = newDataUser;
+            const allDataUsers = result.users || [];
+            allDataUser = allDataUsers;
+            const divContainerData = document.getElementById('container-table');
+            if(!divContainerData) {
+                removeTag('text-message');
+                const container = document.getElementById('container-top');
+                const divContainer = document.createElement('div');
+                divContainer.classList.add('container-table');
+                divContainer.setAttribute('id', 'container-table');
+                const divContainerTable = document.createElement('div');
+                divContainerTable.classList.add('container-table-header');
+                const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
+                divDataTitle.forEach(title => {
+                    const divTitle = document.createElement('div');
+                    divTitle.classList.add('table-header');
+                    const h2Title = document.createElement('h2');
+                    h2Title.textContent = title;
+                    divTitle.appendChild(h2Title);
+                    divContainerTable.appendChild(divTitle);
+                });
+                divContainer.appendChild(divContainerTable);
+                container.insertAdjacentElement('afterend', divContainer);
+                createDataTable(allDataUser);
+            } else {
+                createDataTable(allDataUser);
+            }
         }
     });
 }
 
 function createDataTable(users) {
-    const container = document.getElementById('container-top');
-    const divContainer = document.createElement('div');
-    divContainer.classList.add('container-table');
-    divContainer.setAttribute('id', 'container-table');
-    const divContainerTable = document.createElement('div');
-    divContainerTable.classList.add('container-table-header');
-    const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
-    divDataTitle.forEach(title => {
-        const divTitle = document.createElement('div');
-        divTitle.classList.add('table-header');
-        const h2Title = document.createElement('h2');
-        h2Title.textContent = title;
-        divTitle.appendChild(h2Title);
-        divContainerTable.appendChild(divTitle);
-    });
-    const divContainerContentTable = document.createElement('div');
-    divContainerContentTable.classList.add('container-table-content');
-    users.forEach((user, index) => {
-        const divData = document.createElement('div');
-        divData.classList.add('table-container');
-        divData.setAttribute('user', user.name);
-        const divNo = document.createElement('div');
-        divNo.classList.add('table-content');
-        const pNo = document.createElement('p');
-        pNo.textContent = index + 1;
-        divNo.appendChild(pNo);
-        const divImage = document.createElement('div');
-        divImage.classList.add('table-content');
-        const image = new Image();
-        image.src = user.image;
-        image.alt = user.name;
-        image.width = 472;
-        image.height = 709;
-        divImage.appendChild(image);
-        const divName = document.createElement('div');
-        divName.classList.add('table-content');
-        const pName = document.createElement('p');
-        pName.textContent = user.name;
-        divName.appendChild(pName);
-        const divButton = document.createElement('div');
-        divButton.classList.add('button-container');
-        // const buttonData = [
-        //     { 'id': 'edit-user', 'text': 'Edit'},
-        //     { 'id': 'delete-user', 'text': 'Delete'},
-        //     { 'id': 'absen-user', 'text': 'Check Absen'}
-        // ];
-        const buttonData = [ 'Edit', 'Delete', 'Check Absen'];
-        buttonData.forEach(btn => {
-            const button = document.createElement('button');
-            button.classList.add('button-container-content');
-            button.type = 'button';
-            button.textContent = btn;
-            divButton.appendChild(button);
+    showLoading();
+    const divContainerData = document.getElementById('container-table-content');
+    if(!divContainerData) {
+        const divContainerTable = document.getElementById('container-table');
+        const divContainerContentTable = document.createElement('div');
+        divContainerContentTable.classList.add('container-table-content');
+        divContainerContentTable.setAttribute('id', 'container-table-content');
+        users.forEach((user, index) => {
+            const divDataNo = document.querySelector(`.table-container[no='${index + 1}']`);
+            if(divDataNo) return;
+            const divData = document.createElement('div');
+            divData.classList.add('table-container');
+            divData.setAttribute('no', index + 1);
+            const divNo = document.createElement('div');
+            divNo.classList.add('table-content');
+            const pNo = document.createElement('p');
+            pNo.textContent = index + 1;
+            divNo.appendChild(pNo);
+            const divImage = document.createElement('div');
+            divImage.classList.add('table-content');
+            const image = new Image();
+            image.src = user.image;
+            image.alt = user.name;
+            image.width = 472;
+            image.height = 709;
+            divImage.appendChild(image);
+            const divName = document.createElement('div');
+            divName.classList.add('table-content');
+            const pName = document.createElement('p');
+            pName.textContent = user.name;
+            divName.appendChild(pName);
+            const divButton = document.createElement('div');
+            divButton.classList.add('button-container');
+            divButton.setAttribute('user', user.name);
+            const buttonData = [
+                { 'class': 'edit-user', 'icon': 'edit'},
+                { 'class': 'check-user', 'icon': 'calendar'},
+                { 'class': 'delete-user', 'icon': 'trash'}
+            ]
+            buttonData.forEach(btn => {
+                const divButtonContent = document.createElement('div');
+                divButtonContent.classList.add('button-container-content', btn.class);
+                const button = document.createElement('i');
+                button.setAttribute('data-feather', btn.icon);
+                divButtonContent.appendChild(button);
+                divButton.appendChild(divButtonContent);
+            });
+            divData.append(divNo, divImage, divName, divButton);
+            divContainerContentTable.appendChild(divData);
+            divContainerTable.appendChild(divContainerContentTable);
+            feather.replace();
+            clearShowLoading();
         });
-        divData.append(divNo, divImage, divName, divButton);
-        divContainerContentTable.appendChild(divData);
-    });
-    divContainer.append(divContainerTable, divContainerContentTable);
-    container.insertAdjacentElement('afterend', divContainer);
+    } else {
+        showLoading();
+        const divContainerContentTable = document.getElementById('container-table-content');
+        users.forEach((user, index) => {
+            const divDataNo = document.querySelector(`.table-container[no='${index + 1}']`);
+            if(divDataNo) return;
+            const divData = document.createElement('div');
+            divData.classList.add('table-container');
+            divData.setAttribute('no', index + 1);
+            const divNo = document.createElement('div');
+            divNo.classList.add('table-content');
+            const pNo = document.createElement('p');
+            pNo.textContent = index + 1;
+            divNo.appendChild(pNo);
+            const divImage = document.createElement('div');
+            divImage.classList.add('table-content');
+            const image = new Image();
+            image.src = user.image;
+            image.alt = user.name;
+            image.width = 472;
+            image.height = 709;
+            divImage.appendChild(image);
+            const divName = document.createElement('div');
+            divName.classList.add('table-content');
+            const pName = document.createElement('p');
+            pName.textContent = user.name;
+            divName.appendChild(pName);
+            const divButton = document.createElement('div');
+            divButton.classList.add('button-container');
+            divButton.setAttribute('user', user.name);
+            const buttonData = [
+                { 'class': 'edit-user', 'icon': 'edit'},
+                { 'class': 'check-user', 'icon': 'calendar'},
+                { 'class': 'delete-user', 'icon': 'trash'}
+            ]
+            buttonData.forEach(btn => {
+                const divButtonContent = document.createElement('div');
+                divButtonContent.classList.add('button-container-content', btn.class);
+                const button = document.createElement('i');
+                button.setAttribute('data-feather', btn.icon);
+                divButtonContent.appendChild(button);
+                divButton.appendChild(divButtonContent);
+            });
+            divData.append(divNo, divImage, divName, divButton);
+            divContainerContentTable.appendChild(divData);
+            feather.replace();
+            clearShowLoading();
+        });
+    }
     showAllAction();
 }
 
@@ -181,7 +264,7 @@ function showAddUser() {
             const dataInput = [
                 { 'type': 'text', 'label': 'Nama Lengkap', 'id': 'name', 'min': 1, 'max': 15, 'placeholder': 'masukkan nama lengkap'},
                 { 'type': 'text', 'label': 'Username', 'id': 'username', 'min': 1, 'max': 15, 'placeholder': 'masukkan username'},
-                { 'type': 'text', 'label': 'Password', 'id': 'password', 'min': 1, 'max': 8, 'placeholder': 'masukkan password'},
+                { 'type': 'text', 'label': 'Password', 'id': 'password', 'min': 1, 'max': 15, 'placeholder': 'masukkan password'},
                 { 'type': 'text', 'label': 'Email', 'id': 'email', 'min': 1, 'max': 40, 'placeholder': 'masukkan email'},
                 { 'type': 'file', 'label': 'Upload Foto', 'id': 'photo' },
             ];
@@ -225,6 +308,7 @@ function formatDate(date) {
 };
 
 function sendAddUser() {
+    showLoading();
     const button = document.getElementById('add-user-btn');
     if(!button) return;
     button.addEventListener('click', function() {
@@ -254,42 +338,47 @@ function sendAddUser() {
             .then(response => response.json())
             .then(data => {
                 if(data.data.message) {
-                    alert(data.data.message);
+                    clearShowLoading();
+                    showAlert(data.data.message);
+                    const name = document.getElementById('name').value = '';
+                    const email = document.getElementById('email').value = '';
+                    const username = document.getElementById('username').value = '';
+                    const password = document.getElementById('password').value = '';
+                    const photo = document.getElementById('photo').value = '';
                 } else {
-                    alert(data.data.message);
+                    clearShowLoading();
+                    showAlert(data.data.message);
                 }
             })
         }
         reader.readAsDataURL(file);
         if(!name && !email && !username && !password) {
-            alert('Silahkan masukkan data terlebih dahulu.');
+            showAlert('Silahkan masukkan data terlebih dahulu.');
         } else if(!name) {
-            alert('Silahkan masukkan nama lengkap terlebih dahulu.');
+            showAlert('Silahkan masukkan nama lengkap terlebih dahulu.');
         } else if(!email) {
-            alert('Silahkan masukkan email terlebih dahulu.');
+            showAlert('Silahkan masukkan email terlebih dahulu.');
         } else if(!username) {
-            alert('Silahkan masukkan username terlebih dahulu.');
+            showAlert('Silahkan masukkan username terlebih dahulu.');
         } else if(!password) {
-            alert('Silahkan masukkan password terlebih dahulu.');
+            showAlert('Silahkan masukkan password terlebih dahulu.');
         } else if(!emailPattern.test(email)) {
-            alert('Silahkan masukkan email dengan berformat @gmail.com');
+            showAlert('Silahkan masukkan email dengan berformat @gmail.com');
         } else if(!photo.files[0]) {
-            alert('Silahkan upload foto terlebih dahulu.');
+            showAlert('Silahkan upload foto terlebih dahulu.');
         }
-    })
-    // const divContainer = document.getElementById('container-add-user');
-    // if(!divContainer) {
-    // }
+    });
+    clearShowLoading();
 }
 
 function refreshData() {
     const container = document.getElementById('container-refresh');
     container.addEventListener('click', function() {
-        const data = document.querySelectorAll('.container-remove');
-        data.forEach(clear => {
-            clear.remove();
-        });
+        showLoading();
+        const data = document.getElementById('container-add-user');
+        if(data) data.remove();
         showDataTable();
+        clearShowLoading();
     })
 }
 
@@ -298,15 +387,73 @@ function showAllAction() {
 }
 
 function deleteAction() {
-    const data = document.querySelectorAll('.button-container-content');
-    data.forEach(btn => {
+    document.querySelectorAll('.delete-user').forEach(btn => {
         btn.addEventListener('click', function(e) {
-            console.log(e);
-            const parent = e.target.closest('.table-container');
-            if(parent) {
-                const user = parent.getAttribute('user');
-                console.log('User yang diklik:', user);
-            }
+            const parent = e.target.closest('.button-container');
+            const user = parent.getAttribute('user');
+            const div = parent.closest('.table-container');
+            fetch('https://sukasehat.com/API/public/absen/login/check_delete_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: user })
+            })
+            .then(response => response.json())
+            .then(data => {
+                result = data.data;
+                showLoading();
+                div.remove();
+                clearShowLoading();
+                dataUser = dataUser.filter(name => name != user);
+                allDataUser = allDataUser.filter(u => u.name !== user);
+                showAlert(result.message);
+            })
         })
     })
+}
+
+function showAlert(text) {
+    const main = document.getElementById('main-container');
+    const container = document.getElementById('alert-container');
+    if(!container) {
+        const divContainer = document.createElement('div');
+        divContainer.classList.add('alert-container');
+        divContainer.setAttribute('id', 'alert-container');
+        const divContent = document.createElement('div');
+        divContent.classList.add('alert-content');
+        const p = document.createElement('p');
+        p.textContent = text;
+        const button = document.createElement('button');
+        button.setAttribute('id', 'alert-close');
+        button.textContent = 'Saya mengerti.';
+        button.type = 'reset';
+        divContent.append(p, button);
+        divContainer.appendChild(divContent);
+        main.insertAdjacentElement('beforeend', divContainer);
+        const buttonClose = document.getElementById('alert-close');
+        buttonClose.addEventListener('click', function() {
+            const alert = document.getElementById('alert-container');
+            alert.remove();
+        })
+    }
+}
+
+function showLoading() {
+    const loader = document.getElementById('loader');
+    if(!loader) {
+        const section = document.getElementById('main-container');
+        const loadingContainer = document.createElement('div');
+        loadingContainer.classList.add('loader-wrapper');
+        loadingContainer.setAttribute('id', 'loader');
+        const loadingContent = document.createElement('div');
+        loadingContent.classList.add('loader');
+        loadingContainer.appendChild(loadingContent);
+        section.insertAdjacentElement('beforeend', loadingContainer);
+    }
+};
+
+function clearShowLoading() {
+    setTimeout(() => {
+        const loader = document.getElementById('loader');
+        if(loader) loader.remove();
+    }, 500);
 }

@@ -118,25 +118,19 @@ function showForm() {
         clearLoader();
         result = data.data;
         if(result.success) {
-            if(result.token) {
-                clearFormLoginSuccess();
-                showAlert(result.message);
-                setTimeout(() => {
-                    window.location.href = 'admin';
-                }, 1000);
-            } else {
-                clearFormLoginSuccess();
-                showAlert(result.message);
+            clearFormLoginSuccess();
+            showAlert(result.message);
+            setTimeout(() => {
+                window.location.href = result.redirect;
+            }, 1000);
+            if(result.user) {
                 localStorage.setItem('user', result.user);
-                setTimeout(() => {
-                    window.location.href = 'dashboard';
-                }, 1000);
-            };
+            }
         } else {
             showAlert(result.message);
             password.value = '';
             clearPopup();
-        };
+        }
     })
     .catch(err => { 
         showAlert('Server sedang down.');
@@ -171,14 +165,17 @@ function clearPopup() {
 
 
 function showAlert(text) {
-    const divContainer = document.createElement('div');
-    divContainer.classList.add('popup-container');
-    divContainer.setAttribute('id', 'popup-container');
-    const divContent = document.createElement('div');
-    divContent.classList.add('popup-content');
-    const pContent = document.createElement('p');
-    pContent.textContent = text;
-    divContent.appendChild(pContent);
-    divContainer.appendChild(divContent);
-    document.body.appendChild(divContainer);
+    const container = document.getElementById('popup-container');
+    if(!container) {
+        const divContainer = document.createElement('div');
+        divContainer.classList.add('popup-container');
+        divContainer.setAttribute('id', 'popup-container');
+        const divContent = document.createElement('div');
+        divContent.classList.add('popup-content');
+        const pContent = document.createElement('p');
+        pContent.textContent = text;
+        divContent.appendChild(pContent);
+        divContainer.appendChild(divContent);
+        document.body.appendChild(divContainer);
+    }
 }

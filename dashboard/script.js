@@ -409,25 +409,28 @@ function showWorkOut() {
 
 function showAlert(text) {
     const main = document.getElementById('main-container');
-    const divContainer = document.createElement('div');
-    divContainer.classList.add('alert-container');
-    divContainer.setAttribute('id', 'alert-container');
-    const divContent = document.createElement('div');
-    divContent.classList.add('alert-content');
-    const p = document.createElement('p');
-    p.textContent = text;
-    const button = document.createElement('button');
-    button.setAttribute('id', 'alert-close');
-    button.textContent = 'Saya mengerti.';
-    button.type = 'reset';
-    divContent.append(p, button);
-    divContainer.appendChild(divContent);
-    main.insertAdjacentElement('beforeend', divContainer);
-    const buttonClose = document.getElementById('alert-close');
-    buttonClose.addEventListener('click', function() {
-        const alert = document.getElementById('alert-container');
-        alert.remove();
-    })
+    const container = document.getElementById('alert-container');
+    if(!container) {
+        const divContainer = document.createElement('div');
+        divContainer.classList.add('alert-container');
+        divContainer.setAttribute('id', 'alert-container');
+        const divContent = document.createElement('div');
+        divContent.classList.add('alert-content');
+        const p = document.createElement('p');
+        p.textContent = text;
+        const button = document.createElement('button');
+        button.setAttribute('id', 'alert-close');
+        button.textContent = 'Saya mengerti.';
+        button.type = 'reset';
+        divContent.append(p, button);
+        divContainer.appendChild(divContent);
+        main.insertAdjacentElement('beforeend', divContainer);
+        const buttonClose = document.getElementById('alert-close');
+        buttonClose.addEventListener('click', function() {
+            const alert = document.getElementById('alert-container');
+            alert.remove();
+        })
+    }
 }
 
 function showLoading() {
