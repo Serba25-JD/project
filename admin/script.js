@@ -82,38 +82,26 @@ function showLayoutTop() {
     showDataTable();
 }
 
-let dataUser = [];
-let allDataUser = [];
+let lastHash = null;
 
 function showDataTable() {
     fetch('https://sukasehat.com/API/public/absen/user-list')
     .then(response => response.json())
     .then(data => {
         result = data.result;
-        if(result.message) {
-            showLoading();
+        const currentHash = result.cache;
+        if(result.status === false) {
             const divContainer = document.getElementById('container-top');
             removeTag('text-message');
             removeTag('container-table');
             const pData = document.createElement('p');
             pData.setAttribute('id', 'text-message');
             pData.textContent = result.message;
-            divContainer.insertAdjacentElement('afterend', pData);
             clearShowLoading();
-            dataUser = [];
-            allDataUser = [];
-            return;
-        } else if (result.users && result.users.length > 0) {
-            const newDataUser = result.users.map(user => user.name);
-            const isSame = dataUser.length === newDataUser.length && dataUser.every((val, index) => val === newDataUser[index]);
-            if(isSame) {
-                showLoading();
-                clearShowLoading();
-                return;
-            }
-            dataUser = newDataUser;
-            const allDataUsers = result.users || [];
-            allDataUser = allDataUsers;
+            setTimeout(() => {
+                divContainer.insertAdjacentElement('afterend', pData);
+            }, 700);
+        } else if(currentHash === lastHash) {
             const divContainerData = document.getElementById('container-table');
             if(!divContainerData) {
                 removeTag('text-message');
@@ -134,18 +122,43 @@ function showDataTable() {
                 });
                 divContainer.appendChild(divContainerTable);
                 container.insertAdjacentElement('afterend', divContainer);
-                createDataTable(allDataUser);
-            } else {
-                createDataTable(allDataUser);
-            }
-        }
+                createDataTable(result.users);
+            };
+        } else {
+            lastHash = currentHash;
+            const divContainerData = document.getElementById('container-table');
+            if(!divContainerData) {
+                removeTag('text-message');
+                const container = document.getElementById('container-top');
+                const divContainer = document.createElement('div');
+                divContainer.classList.add('container-table');
+                divContainer.setAttribute('id', 'container-table');
+                const divContainerTable = document.createElement('div');
+                divContainerTable.classList.add('container-table-header');
+                const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
+                divDataTitle.forEach(title => {
+                    const divTitle = document.createElement('div');
+                    divTitle.classList.add('table-header');
+                    const h2Title = document.createElement('h2');
+                    h2Title.textContent = title;
+                    divTitle.appendChild(h2Title);
+                    divContainerTable.appendChild(divTitle);
+                });
+                divContainer.appendChild(divContainerTable);
+                container.insertAdjacentElement('afterend', divContainer);
+                createDataTable(result.users);
+            };
+        };
+        if(result.users.length === 0) {
+            removeTag('container-table');
+        };
     });
 }
 
 function createDataTable(users) {
-    showLoading();
     const divContainerData = document.getElementById('container-table-content');
     if(!divContainerData) {
+        showLoading();
         const divContainerTable = document.getElementById('container-table');
         const divContainerContentTable = document.createElement('div');
         divContainerContentTable.classList.add('container-table-content');
@@ -259,7 +272,6 @@ function showAddUser() {
             const pText = document.getElementById('text-message');
             if(pText) pText.remove();
             const divContent = document.createElement('div');
-            divContent.classList.add('container-remove');
             divContent.setAttribute('id', 'container-add-user');
             const dataInput = [
                 { 'type': 'text', 'label': 'Nama Lengkap', 'id': 'name', 'min': 1, 'max': 15, 'placeholder': 'masukkan nama lengkap'},
@@ -312,6 +324,7 @@ function sendAddUser() {
     const button = document.getElementById('add-user-btn');
     if(!button) return;
     button.addEventListener('click', function() {
+        showLoading();
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
         const username = document.getElementById('username').value;
@@ -320,6 +333,28 @@ function sendAddUser() {
         const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
         const tanggal = `${formatDate(new Date())}`;
         const file = photo.files[0];
+        if(!name && !email && !username && !password) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan data terlebih dahulu.');
+        } else if(!name) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan nama lengkap terlebih dahulu.');
+        } else if(!email) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan email terlebih dahulu.');
+        } else if(!username) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan username terlebih dahulu.');
+        } else if(!password) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan password terlebih dahulu.');
+        } else if(!emailPattern.test(email)) {
+            clearShowLoading();
+            return showAlert('Silahkan masukkan email dengan berformat @gmail.com');
+        } else if(!photo.files[0]) {
+            clearShowLoading();
+            return showAlert('Silahkan upload foto terlebih dahulu.');
+        }
         const reader = new FileReader();
         reader.onload = function (event) {
             const base64Image = event.target.result.split(',')[1];
@@ -352,21 +387,6 @@ function sendAddUser() {
             })
         }
         reader.readAsDataURL(file);
-        if(!name && !email && !username && !password) {
-            showAlert('Silahkan masukkan data terlebih dahulu.');
-        } else if(!name) {
-            showAlert('Silahkan masukkan nama lengkap terlebih dahulu.');
-        } else if(!email) {
-            showAlert('Silahkan masukkan email terlebih dahulu.');
-        } else if(!username) {
-            showAlert('Silahkan masukkan username terlebih dahulu.');
-        } else if(!password) {
-            showAlert('Silahkan masukkan password terlebih dahulu.');
-        } else if(!emailPattern.test(email)) {
-            showAlert('Silahkan masukkan email dengan berformat @gmail.com');
-        } else if(!photo.files[0]) {
-            showAlert('Silahkan upload foto terlebih dahulu.');
-        }
     });
     clearShowLoading();
 }
@@ -375,8 +395,7 @@ function refreshData() {
     const container = document.getElementById('container-refresh');
     container.addEventListener('click', function() {
         showLoading();
-        const data = document.getElementById('container-add-user');
-        if(data) data.remove();
+        removeTag('container-add-user');
         showDataTable();
         clearShowLoading();
     })
@@ -389,6 +408,7 @@ function showAllAction() {
 function deleteAction() {
     document.querySelectorAll('.delete-user').forEach(btn => {
         btn.addEventListener('click', function(e) {
+            showLoading();
             const parent = e.target.closest('.button-container');
             const user = parent.getAttribute('user');
             const div = parent.closest('.table-container');
@@ -400,12 +420,10 @@ function deleteAction() {
             .then(response => response.json())
             .then(data => {
                 result = data.data;
-                showLoading();
                 div.remove();
                 clearShowLoading();
-                dataUser = dataUser.filter(name => name != user);
-                allDataUser = allDataUser.filter(u => u.name !== user);
                 showAlert(result.message);
+                showDataTable();
             })
         })
     })

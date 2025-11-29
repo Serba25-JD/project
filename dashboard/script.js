@@ -22,7 +22,7 @@ function showLayoutHeader() {
     const imageLeft = new Image();
     imageLeft.src = 'https://smk-katolik-mariana.infinityfreeapp.com/assets/image/SMK.png';
     imageLeft.width = '150';
-    imageLeft.height = '123.56';
+    imageLeft.height = '124';
     imageLeft.loading = 'lazy';
     const h1 = document.createElement('h1');
     h1.textContent = 'SMK Swasta Katolik Mariana';
@@ -30,18 +30,22 @@ function showLayoutHeader() {
     // Right
     const divRight = document.createElement('div');
     divRight.classList.add('header-container-content');
+    const userData = localStorage.getItem('user');
     const userIcon = document.createElement('i');
     userIcon.setAttribute('data-feather', 'user');
     const userLogout = document.createElement('i');
     userLogout.setAttribute('data-feather', 'log-out');
     userLogout.setAttribute('id', 'user_log-out');
-    const userData = localStorage.getItem('user');
-    const p = document.createElement('p');
-    p.textContent = userData.email;
-    divRight.append(userIcon, p, userLogout);
+    fetch(`https://sukasehat.com/API/public/absen/login/user?username=${userData}`)
+    .then(response => response.json())
+    .then(data => {
+        const p = document.createElement('p');
+        p.textContent = data.email;
+        divRight.append(userIcon, p, userLogout);
+        feather.replace();
+        showHeaderLogout();
+    });
     header.append(divLeft, divRight);
-    feather.replace();
-    showHeaderLogout();
 };
 
 function showHeaderLogout() {
@@ -237,6 +241,7 @@ function showWorkIn() {
     fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         const result_time = data.result.in.time;
         if(data.result.in.status === false) {
             classInWork.classList.remove('active');
@@ -256,7 +261,7 @@ function showWorkIn() {
                     const userLng = pos.coords.longitude;
                     const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
                     const jarakMeter = jarakKm * 1000;
-                    if (jarakMeter => radiusMeter) {
+                    if (jarakMeter <= radiusMeter) {
                         showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
                         const input = document.createElement('input');
                         input.type = 'file';
@@ -345,7 +350,7 @@ function showWorkOut() {
                     const userLng = pos.coords.longitude;
                     const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
                     const jarakMeter = jarakKm * 1000;
-                    if (jarakMeter => radiusMeter) {
+                    if (jarakMeter <= radiusMeter) {
                         showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
                         const input = document.createElement('input');
                         input.type = 'file';

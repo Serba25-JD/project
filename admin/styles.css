@@ -69,6 +69,7 @@ html, body {
     align-items: center;
     justify-content: space-between;
     padding: 2rem;
+    gap: 2rem;
 }
 
 #header-container .header-container-content {
@@ -181,6 +182,7 @@ html, body {
     width: 20%;
     height: auto;
     border-radius: 50%;
+    object-fit: cover;
 }
 
 .container-table .container-table-content .table-container .button-container {
@@ -333,6 +335,18 @@ html, body {
 @media (max-width: 600px) {
     html, body {
         font-size: 70%;
+    }
+    #header-container {
+        flex-direction: column;
+    }
+    .container-table .container-table-header {
+        grid-template-columns: repeat(4, 47px);
+    }
+    .container-table .container-table-content .table-container {
+        grid-template-columns: repeat(4, 47px);
+    }
+    .container-table .container-table-content .table-container .table-content img {
+        width: 100%;
     }
 }
 

@@ -111,7 +111,7 @@ function showForm() {
     fetch('https://sukasehat.com/API/public/absen/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.value, password: password.value })
+        body: JSON.stringify({ email: email.value, password: password.value, username: email.value })
     })
     .then(response => response.json())
     .then(data => {
