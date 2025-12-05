@@ -13,12 +13,12 @@ function showLayout() {
     showLayoutHeader();
     showLayoutTop();
     refreshData();
-}
+};
 
 function removeTag(id) {
     const tag = document.getElementById(id);
     if(tag) tag.remove();
-}
+};
 
 function showLayoutHeader() {
     const header = document.getElementById('header-container');
@@ -80,85 +80,87 @@ function showLayoutTop() {
     feather.replace();
     showAddUser();
     showDataTable();
-}
-
-let lastHash = null;
+};
 
 function showDataTable() {
+    const storageData = localStorage.getItem('refreshData');
+    if(storageData) {
+        showLoadDataTable();
+        clearShowLoading();
+    } else {
+        showLoadDataTable();
+        clearShowLoading();
+    };
+};
+
+function showLoadDataTable() {
+    const storageData = localStorage.getItem('refreshData');
+    const parseData = storageData ? JSON.parse(storageData) : { lastHash: null, users: [] };
+    const lastHash = parseData.lastHash || null;
+    const users = parseData.users || [];
     fetch('https://sukasehat.com/API/public/absen/user-list')
     .then(response => response.json())
     .then(data => {
         result = data.result;
         const currentHash = result.cache;
-        if(result.status === false) {
+        if(!result.status && !users || users.length === 0) {
             const divContainer = document.getElementById('container-top');
             removeTag('text-message');
             removeTag('container-table');
+            if(document.getElementById('text-message')) return;
             const pData = document.createElement('p');
             pData.setAttribute('id', 'text-message');
             pData.textContent = result.message;
+            localStorage.removeItem('refreshData');
+            divContainer.insertAdjacentElement('afterend', pData);
             clearShowLoading();
-            setTimeout(() => {
-                divContainer.insertAdjacentElement('afterend', pData);
-            }, 700);
-        } else if(currentHash === lastHash) {
+        };
+        if(currentHash === lastHash) {
             const divContainerData = document.getElementById('container-table');
             if(!divContainerData) {
-                removeTag('text-message');
-                const container = document.getElementById('container-top');
-                const divContainer = document.createElement('div');
-                divContainer.classList.add('container-table');
-                divContainer.setAttribute('id', 'container-table');
-                const divContainerTable = document.createElement('div');
-                divContainerTable.classList.add('container-table-header');
-                const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
-                divDataTitle.forEach(title => {
-                    const divTitle = document.createElement('div');
-                    divTitle.classList.add('table-header');
-                    const h2Title = document.createElement('h2');
-                    h2Title.textContent = title;
-                    divTitle.appendChild(h2Title);
-                    divContainerTable.appendChild(divTitle);
-                });
-                divContainer.appendChild(divContainerTable);
-                container.insertAdjacentElement('afterend', divContainer);
-                createDataTable(result.users);
+                createDataTableContainer();
+                createDataTable(users);
+            } else {
+                createDataTable(users);
             };
         } else {
-            lastHash = currentHash;
+            localStorage.setItem('refreshData', JSON.stringify({lastHash: currentHash, users: result.users}));
             const divContainerData = document.getElementById('container-table');
             if(!divContainerData) {
-                removeTag('text-message');
-                const container = document.getElementById('container-top');
-                const divContainer = document.createElement('div');
-                divContainer.classList.add('container-table');
-                divContainer.setAttribute('id', 'container-table');
-                const divContainerTable = document.createElement('div');
-                divContainerTable.classList.add('container-table-header');
-                const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
-                divDataTitle.forEach(title => {
-                    const divTitle = document.createElement('div');
-                    divTitle.classList.add('table-header');
-                    const h2Title = document.createElement('h2');
-                    h2Title.textContent = title;
-                    divTitle.appendChild(h2Title);
-                    divContainerTable.appendChild(divTitle);
-                });
-                divContainer.appendChild(divContainerTable);
-                container.insertAdjacentElement('afterend', divContainer);
+                createDataTableContainer();
+                createDataTable(result.users);
+            } else {
                 createDataTable(result.users);
             };
         };
-        if(result.users.length === 0) {
-            removeTag('container-table');
-        };
     });
-}
+};
+
+function createDataTableContainer() {
+    removeTag('text-message');
+    if(document.getElementById('container-table')) return;
+    const container = document.getElementById('container-top');
+    const divContainer = document.createElement('div');
+    divContainer.classList.add('container-table');
+    divContainer.setAttribute('id', 'container-table');
+    const divContainerTable = document.createElement('div');
+    divContainerTable.classList.add('container-table-header');
+    const divDataTitle = ['No', 'Foto', 'Nama Lengkap', 'Aksi'];
+    divDataTitle.forEach(title => {
+        const divTitle = document.createElement('div');
+        divTitle.classList.add('table-header');
+        const h2Title = document.createElement('h2');
+        h2Title.textContent = title;
+        divTitle.appendChild(h2Title);
+        divContainerTable.appendChild(divTitle);
+    });
+    divContainer.appendChild(divContainerTable);
+    container.insertAdjacentElement('afterend', divContainer);
+};
 
 function createDataTable(users) {
     const divContainerData = document.getElementById('container-table-content');
     if(!divContainerData) {
-        showLoading();
         const divContainerTable = document.getElementById('container-table');
         const divContainerContentTable = document.createElement('div');
         divContainerContentTable.classList.add('container-table-content');
@@ -194,7 +196,7 @@ function createDataTable(users) {
                 { 'class': 'edit-user', 'icon': 'edit'},
                 { 'class': 'check-user', 'icon': 'calendar'},
                 { 'class': 'delete-user', 'icon': 'trash'}
-            ]
+            ];
             buttonData.forEach(btn => {
                 const divButtonContent = document.createElement('div');
                 divButtonContent.classList.add('button-container-content', btn.class);
@@ -207,10 +209,8 @@ function createDataTable(users) {
             divContainerContentTable.appendChild(divData);
             divContainerTable.appendChild(divContainerContentTable);
             feather.replace();
-            clearShowLoading();
         });
     } else {
-        showLoading();
         const divContainerContentTable = document.getElementById('container-table-content');
         users.forEach((user, index) => {
             const divDataNo = document.querySelector(`.table-container[no='${index + 1}']`);
@@ -255,11 +255,10 @@ function createDataTable(users) {
             divData.append(divNo, divImage, divName, divButton);
             divContainerContentTable.appendChild(divData);
             feather.replace();
-            clearShowLoading();
         });
-    }
+    };
     showAllAction();
-}
+};
 
 function showAddUser() {
     const divTop = document.getElementById('container-top');
@@ -304,9 +303,9 @@ function showAddUser() {
             divContent.appendChild(button);
             divTop.insertAdjacentElement('afterend', divContent);
             sendAddUser();
-        }
+        };
     });
-}
+};
 
 function formatDate(date) {
     const months = [
@@ -389,7 +388,7 @@ function sendAddUser() {
         reader.readAsDataURL(file);
     });
     clearShowLoading();
-}
+};
 
 function refreshData() {
     const container = document.getElementById('container-refresh');
@@ -397,13 +396,12 @@ function refreshData() {
         showLoading();
         removeTag('container-add-user');
         showDataTable();
-        clearShowLoading();
-    })
-}
+    });
+};
 
 function showAllAction() {
     deleteAction();
-}
+};
 
 function deleteAction() {
     document.querySelectorAll('.delete-user').forEach(btn => {
@@ -421,13 +419,17 @@ function deleteAction() {
             .then(data => {
                 result = data.data;
                 div.remove();
-                clearShowLoading();
                 showAlert(result.message);
-                showDataTable();
-            })
-        })
-    })
-}
+                const storage = localStorage.getItem("refreshData");
+                if (!storage) return;
+                const datas = JSON.parse(storage);
+                datas.users = datas.users.filter(users => users.name !== user);
+                localStorage.setItem("refreshData", JSON.stringify(datas));
+                clearShowLoading();
+            });
+        });
+    });
+};
 
 function showAlert(text) {
     const main = document.getElementById('main-container');
@@ -451,9 +453,9 @@ function showAlert(text) {
         buttonClose.addEventListener('click', function() {
             const alert = document.getElementById('alert-container');
             alert.remove();
-        })
-    }
-}
+        });
+    };
+};
 
 function showLoading() {
     const loader = document.getElementById('loader');
@@ -466,7 +468,7 @@ function showLoading() {
         loadingContent.classList.add('loader');
         loadingContainer.appendChild(loadingContent);
         section.insertAdjacentElement('beforeend', loadingContainer);
-    }
+    };
 };
 
 function clearShowLoading() {
@@ -474,4 +476,4 @@ function clearShowLoading() {
         const loader = document.getElementById('loader');
         if(loader) loader.remove();
     }, 500);
-}
+};

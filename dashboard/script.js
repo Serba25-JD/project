@@ -110,7 +110,7 @@ function showLayoutMain() {
         divLeft.classList.add('left-container-content');
         sectionMid.classList.add('mid-content');
         const h2Left = document.createElement('h2');
-        h2Left.textContent = `${startGreetings()}, ${data.name}.`
+        h2Left.textContent = `${startGreetings()}, ${data.name}.`;
         const imageLeft = new Image();
         imageLeft.src = data.image;
         imageLeft.width = '110';
@@ -173,6 +173,7 @@ function showWorkData() {
     fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         const stats = data.result.stats;
         const statMap = {
             'today-work': 'today_hours',
@@ -241,7 +242,6 @@ function showWorkIn() {
     fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         const result_time = data.result.in.time;
         if(data.result.in.status === false) {
             classInWork.classList.remove('active');
@@ -261,8 +261,7 @@ function showWorkIn() {
                     const userLng = pos.coords.longitude;
                     const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
                     const jarakMeter = jarakKm * 1000;
-                    if (jarakMeter <= radiusMeter) {
-                        showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
+                    if (jarakMeter => radiusMeter) {
                         const input = document.createElement('input');
                         input.type = 'file';
                         input.accept = 'image/*';
@@ -350,8 +349,7 @@ function showWorkOut() {
                     const userLng = pos.coords.longitude;
                     const jarakKm = getDistanceFromLatLonInKm(userLat, userLng, sekolahLat, sekolahLng);
                     const jarakMeter = jarakKm * 1000;
-                    if (jarakMeter <= radiusMeter) {
-                        showAlert(`Bisa absen. Jarakmu ${jarakMeter.toFixed(2)} meter dari sekolah.`);
+                    if (jarakMeter => radiusMeter) {
                         const input = document.createElement('input');
                         input.type = 'file';
                         input.accept = 'image/*';
