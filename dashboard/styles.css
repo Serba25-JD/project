@@ -179,9 +179,8 @@ html, body {
 
 .mid-content .right-container-content .right-container-content-list .right-container-content-desc {
     display: flex;
-    align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    align-items: center;
 }
 
 .mid-content .right-container-content .right-container-content-list .right-container-content-desc .icon {
@@ -189,8 +188,106 @@ html, body {
 }
 
 .mid-content .right-container-content .right-container-content-list .right-container-content-desc p {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 700;
+}
+
+/* Section Data */
+.data-content {
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.data-content #text-error {
+    margin-top: 2rem;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.data-content #show-data {
+    background-color: var(--accent);
+    width: 10%;
+    text-align: center;
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+.data-content #show-data p {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bg);
+}
+
+/* Section Data Absen */
+/* Header */
+#absen-container {
+    margin: 2rem 0;
+    background-color: var(--primary);
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+    border-radius: var(--radius);
+}
+
+#absen-container.active {
+    animation: dropdownIn 0.5s forwards;
+}
+
+#absen-container.hide {
+    animation: dropdownOut 0.5s forwards;
+}
+
+#absen-container #absen-header-container {
+    display: grid;
+    background-color: var(--accent);
+    text-align: center;
+    grid-template-columns: 100px 1fr 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    gap: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+}
+
+#absen-container #absen-header-container .absen-header-content p {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--bg);
+}
+
+/* Data */
+#absen-container .absen-data-content {
+    display: grid;
+    background-color: var(--primary);
+    text-align: center;
+    grid-template-columns: 100px 1fr 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    gap: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.5rem;
+    border-bottom: 0.1rem solid var(--text);
+}
+
+#absen-container .absen-data-content .absen-data-content-list p {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Footer */
+#footer-container {
+    background-color: var(--primary);
+    padding: 0.5rem;
+    text-align: center;
+}
+
+#footer-container p {
+    font-size: 1rem;
+    font-weight: 800;
 }
 
 /* Alert */
@@ -264,6 +361,32 @@ html, body {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes dropdownIn {
+    0% {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dropdownOut {
+    0% {
+        max-height: 500px;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
 /* Mobile (≤ 600px) */
 @media (max-width: 600px) {
     html, body {
@@ -275,7 +398,13 @@ html, body {
         gap: 2rem;
     }
     .mid-content .right-container-content .right-container-content-list {
-        flex: 1 1 30%;
+        flex: 1 1 40%;
+    }
+    #absen-container #absen-header-container {
+        grid-template-columns: 50px 110px 1fr 1fr;
+    }
+    #absen-container .absen-data-content {
+        grid-template-columns: 50px 110px 1fr 1fr;
     }
 }
 

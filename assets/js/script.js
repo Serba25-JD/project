@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
         inputType.type = input.type;
         inputType.placeholder = `Masukkan ${input.label}`;
         inputType.name = input.id;
+        inputType.minLength = 1;
+        inputType.maxLength = 10;
         inputType.setAttribute('id', input.id);
         wrapper.appendChild(inputType);
         if (input.id === 'password') {

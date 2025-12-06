@@ -13,6 +13,7 @@ function showLayout() {
     showLayoutHeader();
     showLayoutTop();
     refreshData();
+    showFooter();
 };
 
 function removeTag(id) {
@@ -107,6 +108,7 @@ function showLoadDataTable() {
             const divContainer = document.getElementById('container-top');
             removeTag('text-message');
             removeTag('container-table');
+            removeTag('absen');
             if(document.getElementById('text-message')) return;
             const pData = document.createElement('p');
             pData.setAttribute('id', 'text-message');
@@ -266,6 +268,7 @@ function showAddUser() {
     divContainer.addEventListener('click', function() {
         removeTag('text-message');
         removeTag('container-table');
+        removeTag('absen');
         const divContainerContent = document.getElementById('container-add-user');
         if(!divContainerContent) {
             const pText = document.getElementById('text-message');
@@ -395,13 +398,121 @@ function refreshData() {
     container.addEventListener('click', function() {
         showLoading();
         removeTag('container-add-user');
+        removeTag('absen');
         showDataTable();
     });
 };
 
 function showAllAction() {
+    checkAction();
     deleteAction();
 };
+
+function checkAction() {
+    const main = document.getElementById('main-container')
+    document.querySelectorAll('.check-user').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            showLoading();
+            const parent = e.target.closest('.button-container');
+            const user = parent.getAttribute('user');
+            const container = document.getElementById('absen');
+            if(!container) {
+                const section = document.createElement('section');
+                section.classList.add('container');
+                section.setAttribute('id', 'absen');
+                main.insertAdjacentElement('beforeend', section);
+                loadDataAbsen(user);
+            } else {
+                const absenContainer = document.getElementById('absen-container');
+                if(absenContainer) absenContainer.remove();
+                const pContainer = document.getElementById('text-error');
+                if(pContainer) pContainer.remove();
+                loadDataAbsen(user);
+            }
+            clearShowLoading();
+        });
+    });
+};
+
+function loadDataAbsen(user) {
+    fetch(`https://sukasehat.com/API/public/absen/login/user?username=${user}`)
+    .then(response => response.json())
+    .then(data => {
+        const section = document.getElementById('absen');
+        const workData = data.work;
+        if (!workData || Object.keys(workData).length === 0) {
+            const pCheck = document.getElementById('text-error');
+            if(!pCheck) {
+                const p = document.createElement('p');
+                p.textContent = 'Data absen belum ada.';
+                p.setAttribute('id', 'text-error')
+                section.appendChild(p);
+            } else {
+                pCheck.style.display = 'block';
+            };
+            clearShowLoading();
+            return;
+        };
+        const pCheck = document.getElementById('text-error');
+        if(pCheck) pCheck.remove();
+        const sortedDates = Object.keys(workData).sort((a, b) => {
+            return new Date(b) - new Date(a);
+        });
+        const divContainer = document.createElement('div');
+        divContainer.setAttribute('id', 'absen-container');
+        // Header
+        const divHeader = document.createElement('div');
+        divHeader.setAttribute('id','absen-header-container');
+        const divHeaderContentData = ['No', 'Tanggal', 'Masuk', 'Pulang'];
+        divHeaderContentData.forEach(headerText => {
+            const divHeaderContent = document.createElement('div');
+            divHeaderContent.classList.add('absen-header-content');
+            const pHeaderContent = document.createElement('p');
+            pHeaderContent.textContent = headerText;
+            divHeaderContent.appendChild(pHeaderContent);
+            divHeader.appendChild(divHeaderContent);
+        });
+        // Data
+        const divDataContainer = document.createElement('div');
+        divDataContainer.setAttribute('id','absen-data-container');
+        sortedDates.forEach((date, index) => {
+            const entry = workData[date];
+            const masuk = entry.in?.time || "-";
+            const pulang = entry.out?.time || "-";
+            const divDataContent= document.createElement('div');
+            divDataContent.classList.add('absen-data-content');
+            // Nomor
+            const divDataContentNo = document.createElement('div');
+            divDataContentNo.classList.add('absen-data-content-list');
+            const pDivDataContentNo = document.createElement('p');
+            pDivDataContentNo.textContent = `${index + 1}`;
+            divDataContentNo.appendChild(pDivDataContentNo);
+            // Tanggal
+            const divDataContentDate = document.createElement('div');
+            divDataContentDate.classList.add('absen-data-content-list');
+            const pDivDataContentDate = document.createElement('p');
+            pDivDataContentDate.textContent = date;
+            divDataContentDate.appendChild(pDivDataContentDate);
+            // Masuk
+            const divDataContentIn = document.createElement('div');
+            divDataContentIn.classList.add('absen-data-content-list');
+            const pDivDataContentIn = document.createElement('p');
+            pDivDataContentIn.textContent = masuk;
+            divDataContentIn.appendChild(pDivDataContentIn);
+            // Pulang
+            const divDataContentOut = document.createElement('div');
+            divDataContentOut.classList.add('absen-data-content-list');
+            const pDivDataContentOut = document.createElement('p');
+            pDivDataContentOut.textContent = pulang;
+            divDataContentOut.appendChild(pDivDataContentOut);
+            // Masukkan semuanya
+            divDataContent.append(divDataContentNo, divDataContentDate, divDataContentIn, divDataContentOut);
+            divDataContainer.appendChild(divDataContent);
+        });
+        divContainer.append(divHeader, divDataContainer);
+        section.append(divContainer);
+    })
+}
 
 function deleteAction() {
     document.querySelectorAll('.delete-user').forEach(btn => {
@@ -430,6 +541,13 @@ function deleteAction() {
         });
     });
 };
+
+function showFooter() {
+    const footer = document.getElementById('footer-container');
+    const p = document.createElement('p');
+    p.textContent = 'Made with ❤️: Jeremi. (2025)';
+    footer.appendChild(p);
+}
 
 function showAlert(text) {
     const main = document.getElementById('main-container');

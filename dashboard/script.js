@@ -9,11 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
     showLayout();
 });
 
+// Function Show All Layout
 function showLayout() {
     showLayoutHeader();
     showLayoutMain();
+    showLayoutData();
+    showFooter();
 };
+// All Layout END
 
+// Function Show Header
 function showLayoutHeader() {
     const header = document.getElementById('header-container');
     // Left
@@ -43,19 +48,17 @@ function showLayoutHeader() {
         p.textContent = data.email;
         divRight.append(userIcon, p, userLogout);
         feather.replace();
-        showHeaderLogout();
+        const userLogoutBtn = document.getElementById('user_log-out');
+        userLogoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('user');
+            window.location.href = '../';
+        });
     });
     header.append(divLeft, divRight);
 };
+// Show Header END
 
-function showHeaderLogout() {
-    const userLogoutBtn = document.getElementById('user_log-out');
-    userLogoutBtn.addEventListener('click', function() {
-        localStorage.removeItem('user');
-        window.location.href = '../';
-    })
-}
-
+// Function Change Format Date
 function formatDate(date) {
     const months = [
         "Januari","Februari","Maret","April","Mei","Juni",
@@ -66,7 +69,9 @@ function formatDate(date) {
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
 };
+// Format Date END
 
+// Function Change Clock
 function startClock() {
     const pLeft = document.getElementById('wib-clock');
     function updateTime() {
@@ -82,7 +87,9 @@ function startClock() {
     updateTime();
     setInterval(updateTime, 1000);
 };
+// Change Clock END
 
+// Function Greetings
 function startGreetings() {
     const options = { timeZone: "Asia/Jakarta", hour: "2-digit", hour12: false };
     const hourWIB = parseInt(new Intl.DateTimeFormat("id-ID", options).format(new Date()));
@@ -96,7 +103,9 @@ function startGreetings() {
         return "Selamat malam";
     }
 };
+// Greetings END
 
+// Function Show Layout Left
 function showLayoutMain() {
     showLoading();
     const main = document.getElementById('main-container');
@@ -140,40 +149,49 @@ function showLayoutMain() {
             const divIcon = document.createElement('div');
             divIcon.classList.add('right-container-content-desc');
             divIcon.setAttribute('id', dataDivRightList.id);
+            const divIconClass = document.createElement('div');
+            divIconClass.classList.add('icon');
             const icon = document.createElement('i');
             icon.classList.add('icon');
             icon.setAttribute('data-feather', dataDivRightList.feather);
-            divIcon.appendChild(icon);
+            divIconClass.appendChild(icon);
+            divIcon.appendChild(divIconClass);
             divDataRightContainer.append(h2DivRight, divIcon);
             divRight.appendChild(divDataRightContainer);
         });
         sectionMid.append(divLeft, divRight);
-        main.appendChild(sectionMid);
+        // main.appendChild(sectionMid);
+        main.insertAdjacentElement('afterbegin', sectionMid);
         feather.replace();
         startClock();
-        showMidData();
+        showData();
         clearShowLoading();
     });
-}
+};
+// Show Layout Left END
 
-function showMidData() {
+// Function Show All Layout Right 
+function showData() {
     showWorkData();
     showWorkIn();
     showWorkOut();
-}
+};
+// Show All Layout Right END
 
+// Function Change Time
 function decimalToHourMinute(decimal) {
     const hours = Math.floor(decimal);
     const minutes = Math.round((decimal - hours) * 60);
     return `${hours} jam ${minutes} menit`;
-}
+};
+// Change Time END
 
+// Function Layout Left
 function showWorkData() {
     const userData = localStorage.getItem('user');
     fetch(`https://sukasehat.com/API/public/absen/login/user_status?username=${userData}`)
     .then(response => response.json())
     .then(data => {
-        console.log(data);
         const stats = data.result.stats;
         const statMap = {
             'today-work': 'today_hours',
@@ -215,12 +233,13 @@ function showWorkData() {
                 const p = document.createElement('p');
                 p.textContent = 'Tidak ada data.';
                 valueContainer.appendChild(p);
-            }
-        }
+            };
+        };
     });
-}
+};
+// Layout Left END
 
-
+// Function Check Location
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -232,8 +251,10 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c;
     return d;
-}
+};
+// Check Location END
 
+// Function Absen In
 function showWorkIn() {
     const userData = localStorage.getItem('user');
     const container = document.getElementById('main-container');
@@ -318,10 +339,12 @@ function showWorkIn() {
             inWork.style.pointerEvents = 'none'
             inWork.style.opacity = '0.6';
             return;
-        }
-    })
-}
+        };
+    });
+};
+// Absen In END
 
+// Function Absen Out
 function showWorkOut() {
     const userData = localStorage.getItem('user');
     const container = document.getElementById('main-container');
@@ -405,11 +428,159 @@ function showWorkOut() {
             outWork.appendChild(p);
             outWork.style.pointerEvents = 'none'
             outWork.style.opacity = '0.6';
-            return;
-        }
-    })
-}
+        };
+    });
+};
+// Absen Out END
 
+// Function Show Layout Data
+function showLayoutData() {
+    const main = document.getElementById('main-container');
+    const section = document.createElement('section');
+    section.classList.add('data-content');
+    const divButtonShow = document.createElement('div');
+    divButtonShow.setAttribute('id', 'show-data');
+    const pButtonShow = document.createElement('p');
+    pButtonShow.textContent = 'Show';
+    divButtonShow.appendChild(pButtonShow);
+    section.appendChild(divButtonShow);
+    main.insertAdjacentElement('afterbegin', section);
+    showLoadDataAbsen();
+}
+// Show Layout Data END
+
+// Function Show Load Data Absen
+function showLoadDataAbsen() {
+    const button = document.getElementById('show-data');
+    button.addEventListener('click', function(e) {
+        showLoading();
+        const p = e.target.closest('p');
+        if(p) {
+            if (p.textContent.trim() === "Show") {
+                p.textContent = "Hide";
+                loadDataAbsen();
+            } else {
+                p.textContent = "Show";
+                const pCheck = document.getElementById('text-error');
+                if (pCheck) pCheck.style.display = 'none';
+                const container = document.getElementById('absen-container');
+                if (container) {
+                    if (container.classList.contains('active')) {
+                        container.classList.remove('active');
+                        container.classList.add('hide');
+                        container.addEventListener('animationend', () => {
+                            container.style.display = 'none';
+                            container.classList.remove('hide'); 
+                        }, { once: true });
+                    }
+                };
+                clearShowLoading();
+            };
+        };
+    });
+};
+
+function loadDataAbsen() {
+    let dataContainer = document.getElementById('absen-container');
+    if(!dataContainer) {
+        const container = document.getElementById('show-data');
+        const userData = localStorage.getItem('user');
+        fetch(`https://sukasehat.com/API/public/absen/login/user?username=${userData}`)
+        .then(response => response.json())
+        .then(data => {
+            const workData = data.work;
+            if (!workData || Object.keys(workData).length === 0) {
+                const pCheck = document.getElementById('text-error');
+                if(!pCheck) {
+                    const p = document.createElement('p');
+                    p.textContent = 'Data absen belum ada.';
+                    p.setAttribute('id', 'text-error')
+                    container.insertAdjacentElement('afterend', p);
+                } else {
+                    pCheck.style.display = 'block';
+                };
+                clearShowLoading();
+                return;
+            };
+            const pCheck = document.getElementById('text-error');
+            if(pCheck) pCheck.remove();
+            const sortedDates = Object.keys(workData).sort((a, b) => {
+                return new Date(b) - new Date(a);
+            });
+            const divContainer = document.createElement('div');
+            divContainer.setAttribute('id', 'absen-container');
+            divContainer.classList.add('active');
+            // Header
+            const divHeader = document.createElement('div');
+            divHeader.setAttribute('id','absen-header-container');
+            const divHeaderContentData = ['No', 'Tanggal', 'Masuk', 'Pulang'];
+            divHeaderContentData.forEach(headerText => {
+                const divHeaderContent = document.createElement('div');
+                divHeaderContent.classList.add('absen-header-content');
+                const pHeaderContent = document.createElement('p');
+                pHeaderContent.textContent = headerText;
+                divHeaderContent.appendChild(pHeaderContent);
+                divHeader.appendChild(divHeaderContent);
+            });
+            // Data
+            const divDataContainer = document.createElement('div');
+            divDataContainer.setAttribute('id','absen-data-container');
+            sortedDates.forEach((date, index) => {
+                const entry = workData[date];
+                const masuk = entry.in?.time || "-";
+                const pulang = entry.out?.time || "-";
+                const divDataContent= document.createElement('div');
+                divDataContent.classList.add('absen-data-content');
+                // Nomor
+                const divDataContentNo = document.createElement('div');
+                divDataContentNo.classList.add('absen-data-content-list');
+                const pDivDataContentNo = document.createElement('p');
+                pDivDataContentNo.textContent = `${index + 1}`;
+                divDataContentNo.appendChild(pDivDataContentNo);
+                // Tanggal
+                const divDataContentDate = document.createElement('div');
+                divDataContentDate.classList.add('absen-data-content-list');
+                const pDivDataContentDate = document.createElement('p');
+                pDivDataContentDate.textContent = date;
+                divDataContentDate.appendChild(pDivDataContentDate);
+                // Masuk
+                const divDataContentIn = document.createElement('div');
+                divDataContentIn.classList.add('absen-data-content-list');
+                const pDivDataContentIn = document.createElement('p');
+                pDivDataContentIn.textContent = masuk;
+                divDataContentIn.appendChild(pDivDataContentIn);
+                // Pulang
+                const divDataContentOut = document.createElement('div');
+                divDataContentOut.classList.add('absen-data-content-list');
+                const pDivDataContentOut = document.createElement('p');
+                pDivDataContentOut.textContent = pulang;
+                divDataContentOut.appendChild(pDivDataContentOut);
+                // Masukkan semuanya
+                divDataContent.append(divDataContentNo, divDataContentDate, divDataContentIn, divDataContentOut);
+                divDataContainer.appendChild(divDataContent);
+            });
+            divContainer.append(divHeader, divDataContainer);
+            container.insertAdjacentElement('afterend', divContainer);
+            clearShowLoading();
+        });
+    } else {
+        dataContainer.classList.add('active');
+        dataContainer.style.display = 'block';
+        clearShowLoading();
+    };
+};
+// Show Load Data Absen END
+
+// Function Footer
+function showFooter() {
+    const footer = document.getElementById('footer-container');
+    const p = document.createElement('p');
+    p.textContent = 'Made with ❤️: Jeremi. (2025)';
+    footer.appendChild(p);
+};
+// Footer END
+
+// Function Alert
 function showAlert(text) {
     const main = document.getElementById('main-container');
     const container = document.getElementById('alert-container');
@@ -434,8 +605,10 @@ function showAlert(text) {
             alert.remove();
         })
     }
-}
+};
+// Alert END
 
+// Function Loading
 function showLoading() {
     const section = document.getElementById('main-container');
     const loadingContainer = document.createElement('div');
@@ -452,4 +625,5 @@ function clearShowLoading() {
         const loader = document.getElementById('loader');
         loader.remove();
     }, 100);
-}
+};
+// Loading END
