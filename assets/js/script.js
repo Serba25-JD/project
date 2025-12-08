@@ -118,7 +118,7 @@ function showForm() {
     .then(response => response.json())
     .then(data => {
         clearLoader();
-        result = data.data;
+        result = data;
         if(result.success) {
             clearFormLoginSuccess();
             showAlert(result.message);
@@ -137,7 +137,7 @@ function showForm() {
     .catch(err => { 
         showAlert('Server sedang down.');
         clearPopup();
-    })
+    });
 };
 
 function clearFormLoginSuccess() {

@@ -109,6 +109,7 @@ function showLoadDataTable() {
             removeTag('text-message');
             removeTag('container-table');
             removeTag('absen');
+            removeTag('edit');
             if(document.getElementById('text-message')) return;
             const pData = document.createElement('p');
             pData.setAttribute('id', 'text-message');
@@ -269,6 +270,7 @@ function showAddUser() {
         removeTag('text-message');
         removeTag('container-table');
         removeTag('absen');
+        removeTag('edit');
         const divContainerContent = document.getElementById('container-add-user');
         if(!divContainerContent) {
             const pText = document.getElementById('text-message');
@@ -374,20 +376,20 @@ function sendAddUser() {
             })
             .then(response => response.json())
             .then(data => {
-                if(data.data.message) {
-                    clearShowLoading();
-                    showAlert(data.data.message);
+                if(data.message) {
+                    showAlert(data.message);
                     const name = document.getElementById('name').value = '';
                     const email = document.getElementById('email').value = '';
                     const username = document.getElementById('username').value = '';
                     const password = document.getElementById('password').value = '';
                     const photo = document.getElementById('photo').value = '';
-                } else {
                     clearShowLoading();
-                    showAlert(data.data.message);
-                }
-            })
-        }
+                } else {
+                    showAlert(data.message);
+                    clearShowLoading();
+                };
+            });
+        };
         reader.readAsDataURL(file);
     });
     clearShowLoading();
@@ -399,13 +401,99 @@ function refreshData() {
         showLoading();
         removeTag('container-add-user');
         removeTag('absen');
+        removeTag('edit');
         showDataTable();
     });
 };
 
 function showAllAction() {
+    editAction();
     checkAction();
     deleteAction();
+};
+
+function editAction() {
+    const main = document.getElementById('main-container');
+    document.querySelectorAll('.edit-user').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            removeTag('absen');
+            showLoading();
+            const parent = e.target.closest('.button-container');
+            const user = parent.getAttribute('user');
+            const container = document.getElementById('edit');
+            if(!container) {
+                const section = document.createElement('section');
+                section.classList.add('container');
+                section.setAttribute('id', 'edit');
+                main.insertAdjacentElement('beforeend', section);
+                const container = document.getElementById('edit');
+                showLayoutEdit(user);
+            } else {
+                showLayoutEdit(user);
+            };
+        });
+    });
+};
+
+function showLayoutEdit(user) {
+    const container = document.getElementById('edit');
+    container.innerHTML = '';
+    fetch(`https://sukasehat.com/API/public/absen/login/user?username=${user}`)
+    .then(response => response.json())
+    .then(data => {
+        const inputList = [
+            { label: 'Nama Lengkap', type: 'text', value: data.name, id: 'edit-name', readonly: true, autocomplete: 'name' },
+            { label: 'Username', type: 'text', value: data.username, id: 'edit-username', readonly: true, autocomplete: 'username' },
+            { label: 'Email', type: 'text', value: data.email, id: 'edit-email', readonly: true, autocomplete: 'email' },
+            { label: 'Password Baru', type: 'password', value: '', id: 'edit-password', readonly: false, autocomplete: 'new-password' }
+        ];
+        inputList.forEach(item => {
+            const div = document.createElement('div');
+            div.classList.add('edit-form-content');
+            // Label
+            const label = document.createElement('label');
+            label.htmlFor = item.id;
+            label.textContent = item.label;
+            // Input
+            const input = document.createElement('input');
+            input.type = item.type;
+            input.value = item.value;
+            input.id = item.id;
+            input.minLength = 1;
+            input.maxLength = 15;
+            input.setAttribute('autocomplete', item.autocomplete);
+            if(item.readonly) {
+                input.setAttribute('readonly', true);
+                input.classList.add('disabled-input');
+                input.addEventListener('keydown', e => e.preventDefault());
+                input.addEventListener('paste', e => e.preventDefault());
+                input.addEventListener('cut', e => e.preventDefault());
+            };
+            div.append(label, input);
+            container.appendChild(div);
+        });
+        const btn = document.createElement('button');
+        btn.textContent = 'Simpan Perubahan';
+        btn.id = 'edit-save-btn';
+        container.appendChild(btn);
+        clearShowLoading();
+        const button = document.getElementById('edit-save-btn');
+        button.addEventListener('click', function() {
+            showLoading();
+            const password = document.getElementById('edit-password');
+            fetch('https://sukasehat.com/API/public/absen/login/check_change_user', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: password.value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert(data.message);
+                password.value = '';
+                clearShowLoading();
+            });
+        });
+    });
 };
 
 function checkAction() {
@@ -511,8 +599,8 @@ function loadDataAbsen(user) {
         });
         divContainer.append(divHeader, divDataContainer);
         section.append(divContainer);
-    })
-}
+    });
+};
 
 function deleteAction() {
     document.querySelectorAll('.delete-user').forEach(btn => {
@@ -522,15 +610,14 @@ function deleteAction() {
             const user = parent.getAttribute('user');
             const div = parent.closest('.table-container');
             fetch('https://sukasehat.com/API/public/absen/login/check_delete_user', {
-                method: 'POST',
+                method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user: user })
             })
             .then(response => response.json())
             .then(data => {
-                result = data.data;
                 div.remove();
-                showAlert(result.message);
+                showAlert(data.message);
                 const storage = localStorage.getItem("refreshData");
                 if (!storage) return;
                 const datas = JSON.parse(storage);
@@ -547,7 +634,7 @@ function showFooter() {
     const p = document.createElement('p');
     p.textContent = 'Made with ❤️: Jeremi. (2025)';
     footer.appendChild(p);
-}
+};
 
 function showAlert(text) {
     const main = document.getElementById('main-container');

@@ -236,6 +236,7 @@ html, body {
     margin: 1rem 0;
     align-items: flex-start;
 }
+
 .container-add-user-content label {
     font-size: 1rem;
     font-weight: 700;
@@ -255,6 +256,69 @@ html, body {
     border-color: var(--accent);
     box-shadow: 0 0 5px rgba(0, 119, 255, 0.35);
 }
+
+/* Section Edit */
+#edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#edit .edit-form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#edit .edit-form-content label {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+#edit .edit-form-content input {
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #ddd;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    transition: 0.2s;
+    width: 250px;
+}
+
+#edit .edit-form-content input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 5px rgba(0, 119, 255, 0.35);
+}
+
+#edit .edit-form-content .disabled-input {
+    color: #666;
+    background: #f0f0f0 !important;
+    border-color: #ccc !important;
+    pointer-events: none;
+    user-select: none;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+#edit #edit-save-btn {
+    margin-top: 0.5rem;
+    padding: 0.8rem;
+    font-size: 1rem;
+    background: var(--accent);
+    color: var(--primary);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    width: 280px;
+}
+
+#edit #edit-save-btn:hover {
+    background: #005fcc;
+}
+
 
 /* Section Data Absen */
 /* Header */
