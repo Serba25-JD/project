@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Game Matematika </title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cause:wght@100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --abu: #F8F9FA;
+            --biru: #007BFF;
+            --hitam: #343A40;
+            --hijau: #28A745;
+        }
+        .google-sans-flex {
+            font-family: "Google Sans Flex", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            font-variation-settings:
+                "slnt" 0,
+                "wdth" 100,
+                "GRAD" 0,
+                "ROND" 0;
+        }
+    </style>
+</head>
+<body class="bg-[var(--abu)] text-[var(--hitam)] google-sans-flex w-full h-screen">
+    <header class="bg-[var(--hijau)] flex py-2 px-5 justify-between items-center">
+        <h1 class="font-bold text-xl"> Game Matematika </h1>
+        <div class="flex gap-2">
+            <p class="font-bold text-base"> Total Score: </p>
+            <p class="font-bold text-base" id="score"> 0 </p>
+        </div>
+    </header>
+    <main>
+        <div class="w-full py-2 px-5 hidden" id="popup">
+            <div class="bg-[var(--hijau)] rounded-lg p-2 text-center">
+                <h2 class="font-bold text-base" id="popup-text"> </h2>
+            </div>
+        </div>
+        <section class="flex items-center justify-center w-full flex-col gap-5 py-10">
+            <div class="bg-[var(--biru)] w-2xs rounded-lg flex flex-col items-center justify-center gap-2 p-2">
+                <h2 class="font-bold text-xl text-[var(--abu)] text-center" id="quest"> Soal muncul disini! </h2>
+                <input type="text" id="answer-text" class="w-3xs border-2 rounded-xs font-medium text-base px-2 text-center text-[var(--abu)] py-2" placeholder="Masukkan jawaban kalian" minlength="1" maxlength="20">
+                <button type="button" id="answer-btn" class="bg-[var(--hijau)] w-3xs rounded-xs cursor-pointer text-[var(--abu)] font-medium text-base py-2"> Jawab </button>
+            </div>
+            <div class="flex gap-2 items-center justify-center">
+                <button type="reset" id="reset" class="bg-[var(--hijau)] py-2 px-2 rounded-xs text-[var(--abu)] font-medium text-base cursor-pointer"> Reset Game </button>
+                <button type="button" id="play" class="bg-[var(--hijau)] py-2 px-2 rounded-xs text-[var(--abu)] font-medium text-base cursor-pointer"> Mulai Game </button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p class="font-bold text-base text-center"> &copy; Manusia Gabut 2026 </p>
+    </footer>
+
+<script src="script.js" defer></script>
+</body>
+</html>
